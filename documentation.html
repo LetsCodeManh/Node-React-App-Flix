@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Documentation</title>
+  </head>
+  <body>
+    <header>
+      <h1>Movie API Documentation</h1>
+      <p>
+        This web application is similar to Netflix application. This is only for
+        learning and showing purpose only.
+      </p>
+    </header>
+    <main>
+      <section>
+        <h2>Features</h2>
+        <ol>
+          <li>Return a list of ALL movies to the user.</li>
+          <li>
+            Return data (description, genre, director, image URL, whether it's
+            featured or not) about a single movie by title to the user.
+          </li>
+          <li>Return data about a genre (description) by name/title.</li>
+          <li>
+            Return data about a director (bio, birth year, death year) by name.
+          </li>
+          <li>Allow new users to register.</li>
+          <li>Allow users to update their user info.</li>
+          <li>Allow users to add a movie to their list of favorites.</li>
+          <li>Allo users to remove a movie from their list of favorites.</li>
+          <li>Allow existing users to deregister.</li>
+        </ol>
+      </section>
+      <section>
+        <h2>API Endpoints</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>URL</th>
+              <th>HTTP Method</th>
+              <th>Query Parameters</th>
+              <th>Request body data format</th>
+              <th>Response body data format</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Get a list of all movies</td>
+              <td>/movies</td>
+              <td>GET</td>
+              <td>-</td>
+              <td>-</td>
+              <td>
+                [ { "title": "testMovieTitle", "description":
+                "testMovieDescription", "genre": { "genreName": "testGenreName",
+                "genreDescription": "testGenreDescription" }, "directors": {
+                "directorsName": "testDirectorsName", "directorsBio":
+                "testDirectorsBio", "directorsBirth": "testDirectorsBirth" },
+                "movieImagesURL": "https://www.testmovieImagesURL.com",
+                "feature": false }, { "title": "testMovieTitle2", "description":
+                "testMovieDescription2", "genre": { "genreName":
+                "testGenreName2", "genreDescription": "testGenreDescription2" },
+                "directors": { "directorsName": "testDirectorsName2",
+                "directorsBio": "testDirectorsBio2", "directorsBirth":
+                "testDirectorsBirth2" }, "movieImagesURL":
+                "https://www.testmovieImagesURL2.com", "feature": false }, {
+                "title": "testMovieTitle3", "description":
+                "testMovieDescription3", "genre": { "genreName":
+                "testGenreName3", "genreDescription": "testGenreDescription3" },
+                "directors": { "directorsName": "testDirectorsName3",
+                "directorsBio": "testDirectorsBio3", "directorsBirth":
+                "testDirectorsBirth3" }, "movieImagesURL":
+                "https://www.testmovieImagesURL3.com", "feature": false } ]
+              </td>
+            </tr>
+
+            <tr>
+              <td>Get a single movie by title</td>
+              <td>/movies/:movieTitle</td>
+              <td>GET</td>
+              <td>testMovieTitle</td>
+              <td>-</td>
+              <td>
+                { "title": "testMovieTitle", "description":
+                "testMovieDescription", "genre": { "genreName": "testGenreName",
+                "genreDescription": "testGenreDescription" }, "directors": {
+                "directorsName": "testDirectorsName", "directorsBio":
+                "testDirectorsBio", "directorsBirth": "testDirectorsBirth" },
+                "movieImagesURL": "https://www.testmovieImagesURL.com",
+                "feature": false }
+              </td>
+            </tr>
+
+            <tr>
+              <td>Get genre by name</td>
+              <td>/movies/genre/:genreName</td>
+              <td>GET</td>
+              <td>testGenreName</td>
+              <td>-</td>
+              <td>
+                { "genreName": "testGenreName", "genreDescription":
+                "testGenreDescription" }
+              </td>
+            </tr>
+
+            <tr>
+              <td>Get director data by name</td>
+              <td>/movies/directors/:directorName</td>
+              <td>GET</td>
+              <td>testDirecorsName3</td>
+              <td>-</td>
+              <td>
+                { "directorsName": "testDirectorsName3", "directorsBio":
+                "testDirectorsBio3", "directorsBirth": "testDirectorsBirth3" }
+              </td>
+            </tr>
+
+            <tr>
+              <td>Get all Users</td>
+              <td>/users</td>
+              <td>GET</td>
+              <td>-</td>
+              <td>-</td>
+              <td>
+                [ { "id": 1, "name": "test", "favoriteMovies": [] }, { "id": 2,
+                "name": "test2", "favoriteMovies": [ "testMovie1", "testMovie2"
+                ] } ]
+              </td>
+            </tr>
+
+            <tr>
+              <td>Get a User by Username</td>
+              <td>/users/:userName</td>
+              <td>GET</td>
+              <td>test</td>
+              <td>-</td>
+              <td>{ "id": 1, "name": "test", "favoriteMovies": [] }</td>
+            </tr>
+
+            <tr>
+              <td>Allow new users to Register</td>
+              <td>/users</td>
+              <td>POST</td>
+              <td>-</td>
+              <td>{ "name": "Manh" }</td>
+              <td>
+                { "name": "Manh", "id": "eef80212-8fa0-4834-bcd8-362f0f2b7914" }
+              </td>
+            </tr>
+
+            <tr>
+              <td>Allow new users update their user info</td>
+              <td>/users/:id</td>
+              <td>PUT</td>
+              <td>1</td>
+              <td>{ "name": "updatedName" }</td>
+              <td>{ "id": 1, "name": "updatedName", "favoriteMovies": [] }</td>
+            </tr>
+
+            <tr>
+              <td>Adds movie to favorite list</td>
+              <td>/users/:id/:movieTitle</td>
+              <td>POST</td>
+              <td>2, testMovie1</td>
+              <td>-</td>
+              <td>testMovie1 has been added to user 2's array</td>
+            </tr>
+
+            <tr>
+              <td>Delete movie from favorite list</td>
+              <td>/users/:id/:movieTitle</td>
+              <td>DELETE</td>
+              <td>2, testMovie 1</td>
+              <td>-</td>
+              <td>testMovie1 has been remove from user 2's array</td>
+            </tr>
+
+            <tr>
+              <td>Allow existing users to deregister</td>
+              <td>/users/:id</td>
+              <td>DELETE</td>
+              <td>1</td>
+              <td>-</td>
+              <td>user 1 has been deleted</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </body>
+</html>

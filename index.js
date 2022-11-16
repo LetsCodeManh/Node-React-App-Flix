@@ -112,9 +112,9 @@ app.get("/movies", (req, res) => {
 });
 
 // READ
-app.get("/movies/:title", (req, res) => {
-  const { title } = req.params;
-  const movie = movies.find((movie) => movie.title === title);
+app.get("/movies/:movieTitle", (req, res) => {
+  const { movieTitle } = req.params;
+  const movie = movies.find((movie) => movie.title === movieTitle);
 
   if (movie) {
     res.status(200).json(movie);
@@ -138,16 +138,33 @@ app.get("/movies/genre/:genreName", (req, res) => {
 });
 
 // READ
-app.get("/movies/directors/:directorsName", (req, res) => {
-  const { directorsName } = req.params;
-  const directors = movies.find(
-    (movie) => movie.directors.directorsName === directorsName
+app.get("/movies/directors/:directorName", (req, res) => {
+  const { directorName } = req.params;
+  const director = movies.find(
+    (movie) => movie.directors.directorsName === directorName
   ).directors;
 
-  if (directors) {
-    res.status(200).json(directors);
+  if (director) {
+    res.status(200).json(director);
   } else {
-    res.status(400).send("No such directors");
+    res.status(400).send("No such director");
+  }
+});
+
+// READ - Get all users
+app.get("/users", (req, res) => {
+  res.status(200).json(users);
+});
+
+// READ
+app.get("/users/:userName", (req, res) => {
+  const { userName } = req.params;
+  const user = users.find((user) => user.name === userName);
+
+  if (user) {
+    res.status(200).json(user);
+  } else {
+    res.status(400).send("No such user");
   }
 });
 
