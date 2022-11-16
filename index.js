@@ -92,6 +92,20 @@ app.post("/users", (req, res) => {
   }
 });
 
+// CREATE
+app.post("/users/:id/:movieTitle", (req, res) => {
+  const { id, movieTitle } = req.params;
+
+  let user = users.find((user) => user.id == id);
+
+  if (user) {
+    user.favoriteMovies.push(movieTitle);
+    res.status(200).send(`${movieTitle} has been added to user ${id}'s array`);
+  } else {
+    res.status(400).send("No such movie");
+  }
+});
+
 // READ
 app.get("/movies", (req, res) => {
   res.status(200).json(movies);
@@ -152,35 +166,53 @@ app.put("/users/:id", (req, res) => {
   }
 });
 
-// CREATE
-app.post("/users/:id/:movieTitle", (req, res) => {
+// DELETE
+app.delete("/users/:id/:movieTitle", (req, res) => {
   const { id, movieTitle } = req.params;
 
   let user = users.find((user) => user.id == id);
 
   if (user) {
-    user.favoriteMovies.push(movieTitle);
-    res.status(200).json(user);
+    user.favoriteMovies = user.favoriteMovies.filter(
+      (title) => title !== movieTitle
+    );
+    res
+      .status(200)
+      .send(`${movieTitle} has been remove from user ${id}'s array`);
   } else {
     res.status(400).send("No such movie");
   }
 });
 
+// DELETE
+app.delete("/users/:id", (req, res) => {
+  const { id } = req.params;
+
+  let user = users.find((user) => user.id == id);
+
+  if (user) {
+    users = users.filter((user) => user.id != id);
+    res.status(200).send(`user ${id} has been deleted`);
+  } else {
+    res.status(400).send("No such id");
+  }
+});
+
 // Previousl Exercise
-let topBooks = [
-  {
-    title: "Harry Potter and the Sorcerer's Stone",
-    author: "J.K. Rowling",
-  },
-  {
-    title: "Lord of the Rings",
-    author: "J.R.R. Tolkien",
-  },
-  {
-    title: "Twilight",
-    author: "Stephanie Meyer",
-  },
-];
+// let topBooks = [
+//   {
+//     title: "Harry Potter and the Sorcerer's Stone",
+//     author: "J.K. Rowling",
+//   },
+//   {
+//     title: "Lord of the Rings",
+//     author: "J.R.R. Tolkien",
+//   },
+//   {
+//     title: "Twilight",
+//     author: "Stephanie Meyer",
+//   },
+// ];
 
 // GET requests
 // app.get("/", (req, res) => {
