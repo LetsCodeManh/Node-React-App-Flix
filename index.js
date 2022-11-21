@@ -97,6 +97,81 @@ let movies = [
   },
 ];
 
+// Create a movie in movies - This is not in the exercise
+app.post("/movies", (req, res) => {
+  Movie.findOne({ Title: req.body.Title })
+    .then((movie) => {
+      if (movie) {
+        return res.status(400).send(req.body.Title + " already exists");
+      } else {
+        User.create({
+          Title: req.body.Title,
+          Description: req.body.Description,
+          Genre: req.body.Genre,
+          Director: req.body.Director,
+          Actors: req.body.Actors,
+          ImagePath: req.body.ImagePath,
+          Featured: req.body.Featured
+        })
+          .then((movie) => {
+            res.status(200).json(movie);
+          })
+          .catch((error) => {
+            console.error(error);
+            res.status(400).send("Error: " + error);
+          });
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(400).send("Error: " + error);
+    });
+});
+
+// Return a list off ALL movies
+app.get("/movies", (req, res) => {
+  Movie.find() // Find all movies
+    .then((movies) => {
+      res.status(200).json(movies);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error: " + error);
+    });
+});
+
+// Return data (description. genre, directors, image URL, whether it's featured or not) about a single movie by title to the user
+app.get("/movies/:Title", (req, res) => {
+  Movie.findOne({ Title: req.params.Title }) // Find one movie with this Title
+    .then((movie) => {
+      if (movie) {
+        res.status(200).json(movie);
+      } else {
+        res.status(400).send(req.params.Title + " was not found!")
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error: " + error);
+    });
+});
+
+// Delete movie from movies list - This is not in the exercise
+app.delete("/movies/:Title", (req, res) => {
+  Movie.findOneAndRemove({ Title: req.params.Title})
+    .then((movie) => {
+      if (!movie) {
+        res.status(400).send(req.params.Title + " was not found!")
+      } else {
+        res.status(200).send(req.params.Title + " was deleted!")
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(400).send("Error: " + err)
+    })
+});
+
 // CREATE
 app.post("/users", (req, res) => {
   User.findOne({ Username: req.body.Username })
@@ -142,29 +217,7 @@ app.post("/users/:Username/movies/:MovieID", (req, res) => {
     })
 });
 
-// READ
-app.get("/movies", (req, res) => {
-  Movie.find()
-    .then((movies) => {
-      res.status(200).json(movies);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(400).send("Error: " + error);
-    });
-});
 
-// READ
-app.get("/movies/:Title", (req, res) => {
-  Movie.findOne({ Title: req.params.Title })
-    .then((movie) => {
-      res.status(200).json(movie);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(400).send("Error: " + error);
-    });
-});
 
 // READ
 app.get("/movies/genre/:genreName", (req, res) => {
