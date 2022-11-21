@@ -17,6 +17,21 @@ app.use(
   })
 );
 
+const mongoose = require("mongoose");
+const MoviesSchema = require("./models/movies.js");
+const Movie = MoviesSchema.Movie;
+
+const UsersSchema = require("./models/users.js");
+const User = UsersSchema.User;
+
+const GenreSchema = require("./models/genre.js");
+const Genre = GenreSchema.Genre;
+
+const DirectorsSchema = require("./models/directors.js");
+const Director = DirectorsSchema.Director;
+
+mongoose.connect('mongodb://localhost:27017/dbname', { useNewUrlParser: true, useUnifiedTopology: true });
+
 // New Exercise
 let users = [
   {
