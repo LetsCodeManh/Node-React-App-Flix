@@ -24,13 +24,16 @@ const Movie = MoviesSchema.Movie;
 const UsersSchema = require("./models/users.js");
 const User = UsersSchema.User;
 
-const GenreSchema = require("./models/genre.js");
+const GenreSchema = require("./models/genres.js");
 const Genre = GenreSchema.Genre;
 
 const DirectorsSchema = require("./models/directors.js");
 const Director = DirectorsSchema.Director;
 
-mongoose.connect('mongodb://localhost:27017/dbname', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect("mongodb://localhost:27017/dbname", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 // New Exercise
 let users = [
@@ -96,15 +99,40 @@ let movies = [
 
 // CREATE
 app.post("/users", (req, res) => {
-  const newUser = req.body;
+  User.findOne({ Username: req.body.Username })
+    .then((user) => {
+      if (user) {
+        return res.status(400).send(req.body.Username + " already exists");
+      } else {
+        User.create({
+          Username: req.body.Username,
+          Password: req.body.Password,
+          Email: req.body.Email,
+          Birthday: req.body.Birthday,
+        })
+          .then((user) => {
+            res.status(200).json(user);
+          })
+          .catch((error) => {
+            console.error(error);
+            res.status(400).send("Error: " + error);
+          });
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(400).send("Error: " + error);
+    });
 
-  if (newUser.name) {
-    newUser.id = uuid.v4();
-    users.push(newUser);
-    res.status(201).json(newUser);
-  } else {
-    res.status(400).send("User need name!");
-  }
+  // const newUser = req.body;
+
+  // if (newUser.name) {
+  //   newUser.id = uuid.v4();
+  //   users.push(newUser);
+  //   res.status(201).json(newUser);
+  // } else {
+  //   res.status(400).send("User need name!");
+  // }
 });
 
 // CREATE
@@ -168,34 +196,52 @@ app.get("/movies/directors/:directorName", (req, res) => {
 
 // READ - Get all users
 app.get("/users", (req, res) => {
-  res.status(200).json(users);
+  User.find()
+    .then((users) => {
+      res.status(200).json(users);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(400).send("Error: " + error);
+    });
+
+  // res.status(200).json(users);
 });
 
 // READ
-app.get("/users/:userName", (req, res) => {
-  const { userName } = req.params;
-  const user = users.find((user) => user.name === userName);
-
-  if (user) {
-    res.status(200).json(user);
-  } else {
-    res.status(400).send("No such user");
-  }
+app.get("/users/:Username", (req, res) => {
+  User.findOne({ Username: req.params.Username })
+    .then((user) => {
+      res.status(200).json(user);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(400).send("Error: " + error);
+    });
 });
 
 // UPDATE
-app.put("/users/:id", (req, res) => {
-  const { id } = req.params;
-  const updatedUser = req.body;
-
-  let user = users.find((user) => user.id == id);
-
-  if (user) {
-    user.name = updatedUser.name;
-    res.status(200).json(user);
-  } else {
-    res.status(400).send("No such user");
-  }
+app.put("/users/:Username", (req, res) => {
+  User.findOneAndUpdate(
+    { Username: req.params.Username },
+    {
+      $set: {
+        Username: req.body.Username,
+        Password: req.body.Password,
+        Email: req.body.Email,
+        Birthday: req.body.Birthday,
+      },
+    },
+    { new: true },
+    (err, updatedUser) => {
+      if (err) {
+        console.error(err);
+        res.status(400).send("Error: " + err);
+      } else {
+        res.status(200).send(updatedUser);
+      }
+    }
+  );
 });
 
 // DELETE
@@ -229,57 +275,6 @@ app.delete("/users/:id", (req, res) => {
     res.status(400).send("No such id");
   }
 });
-
-// Previousl Exercise
-// let topBooks = [
-//   {
-//     title: "Harry Potter and the Sorcerer's Stone",
-//     author: "J.K. Rowling",
-//   },
-//   {
-//     title: "Lord of the Rings",
-//     author: "J.R.R. Tolkien",
-//   },
-//   {
-//     title: "Twilight",
-//     author: "Stephanie Meyer",
-//   },
-// ];
-
-// GET requests
-// app.get("/", (req, res) => {
-//   res.send("Welcome to my book club!");
-// });
-
-// app.get("/documentation", (req, res) => {
-//   res.sendFile("public/documentation.html", { root: __dirname });
-// });
-
-// app.get("/books", (req, res) => {
-//   res.json(topBooks);
-// });
-
-// let myLogger = (req, res, next) => {
-//   console.log(req.url);
-//   next();
-// };
-
-// let requestTime = (req, res, next) => {
-//   req.requestTime = Date.now();
-//   next();
-// };
-
-// app.get("/", (req, res) => {
-//   let responseText = "Welcome to my app!";
-//   responseText += "<small>Requested at: " + req.requestTime + "</small>";
-//   res.send(responseText);
-// });
-
-// app.get("/secreturl", (req, res) => {
-//   let responseText = "This is a secret url with super top-secret content.";
-//   responseText += "<small>Requested at: " + req.requestTime + "</small>";
-//   res.send(responseText);
-// });
 
 app.listen(8080, () => {
   console.log("Your app is listening on port 8080.");
