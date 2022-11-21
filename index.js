@@ -131,7 +131,9 @@ app.post("/movies", (req, res) => {
 
 // Return a list off ALL movies
 app.get("/movies", (req, res) => {
-  Movie.find() // Find all movies
+  Movie.find()
+    .populate("Genre")
+    .populate("Director") // Find all movies
     .then((movies) => {
       res.status(200).json(movies);
     })
@@ -143,12 +145,52 @@ app.get("/movies", (req, res) => {
 
 // Return data (description. genre, directors, image URL, whether it's featured or not) about a single movie by title to the user
 app.get("/movies/:Title", (req, res) => {
-  Movie.findOne({ Title: req.params.Title }) // Find one movie with this Title
+  Movie.findOne({ Title: req.params.Title })
+    .populate("Genre")
+    .populate("Director") // Find one movie with this Title
     .then((movie) => {
       if (movie) {
         res.status(200).json(movie);
       } else {
         res.status(400).send(req.params.Title + " was not found!");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error: " + error);
+    });
+});
+
+// Return data about a genre
+// Needs to be done - Need helps here
+app.get("/movies/genres/:_Id", (req, res) => {
+  Movie.find({ "Genre._Id": req.params._Id })
+    .populate("Genre")
+    .populate("Director")
+    .then((movies) => {
+      if (movies) {
+        res.status(200).json(movies);
+      } else {
+        res.status(400).send(req.params.Name + " was not found!");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error: " + error);
+    });
+});
+
+// Retunr movie with the director name
+// Needs to be done - Need helps here 
+app.get("/movies/directors/:Name", (req, res) => {
+  Movie.find({ "Director.Name": req.params.Name })
+    .populate("Genre")
+    .populate("Director")
+    .then((movies) => {
+      if (movies) {
+        res.status(200).json(movies);
+      } else {
+        res.status(400).send(req.params.Name + " was not found!");
       }
     })
     .catch((error) => {
@@ -182,7 +224,7 @@ app.put("/movies/:Title", (req, res) => {
       }
     }
   );
-});
+}); // 637be159a7f612ad6135486a
 
 // Delete movie from movies list - This is not in the exercise
 app.delete("/movies/:Title", (req, res) => {
@@ -213,6 +255,7 @@ app.post("/users", (req, res) => {
           Password: req.body.Password,
           Email: req.body.Email,
           Birthday: req.body.Birthday,
+          FavoriteMovies: req.body.FavoriteMovies,
         })
           .then((user) => {
             res.status(200).json(user);
@@ -232,6 +275,7 @@ app.post("/users", (req, res) => {
 // Get all users - This is not in the exercise
 app.get("/users", (req, res) => {
   User.find()
+    .populate("Movie")
     .then((users) => {
       res.status(200).json(users);
     })
@@ -244,6 +288,7 @@ app.get("/users", (req, res) => {
 // Get user by Username in Users list - This is not in the exercise
 app.get("/users/:Username", (req, res) => {
   User.findOne({ Username: req.params.Username })
+    .populate("Movie")
     .then((user) => {
       res.status(200).json(user);
     })
@@ -263,6 +308,7 @@ app.put("/users/:Username", (req, res) => {
         Password: req.body.Password,
         Email: req.body.Email,
         Birthday: req.body.Birthday,
+        FavoriteMovies: req.body.FavoriteMovies,
       },
     },
     { new: true },
@@ -279,12 +325,12 @@ app.put("/users/:Username", (req, res) => {
 
 // Allow users to add a movie to their list of favorites
 // Needs to be done
-app.post("/users/:Username/movies/:MovieID", (req, res) => {
+app.post("/users/:Username/movies/:Title", (req, res) => {
   User.findOneAndUpdate(
     { Username: req.params.Username },
     {
       $push: {
-        FavoriteMovies: req.params.MovieID,
+        FavoriteMovies: req.params.Title,
       },
     },
     { new: true },
@@ -302,20 +348,18 @@ app.post("/users/:Username/movies/:MovieID", (req, res) => {
 // Allow users to remove a movie from their list of favorites
 // Needs to be done
 app.delete("/users/:Username/movies/:Title", (req, res) => {
-  const { id, movieTitle } = req.params;
-
-  let user = users.find((user) => user.id == id);
-
-  if (user) {
-    user.favoriteMovies = user.favoriteMovies.filter(
-      (title) => title !== movieTitle
-    );
-    res
-      .status(200)
-      .send(`${movieTitle} has been remove from user ${id}'s array`);
-  } else {
-    res.status(400).send("No such movie");
-  }
+  User.findOneAndDelete({ "FavouriteMovies.Title": req.params.Title })
+    .then((movie) => {
+      if (!movie) {
+        res.status(400).send(req.params.Title + " was not found!");
+      } else {
+        res.status(200).send(req.params.Title + " was deleted!");
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(400).send("Error: " + err);
+    });
 });
 
 // Allow existing users to deregister
@@ -373,7 +417,7 @@ app.get("/genres", (req, res) => {
     });
 });
 
-// Get genre by Name in Users list - This is not in the exercise
+// Return data about a genre (descriotion) by name/title
 app.get("/genres/:Name", (req, res) => {
   Genre.findOne({ Name: req.params.Name })
     .then((genre) => {
@@ -452,7 +496,7 @@ app.post("/directors", (req, res) => {
     });
 });
 
-// Get ALL genres - This is not in the exercise
+// Get ALL directors - This is not in the exercise
 app.get("/directors", (req, res) => {
   Director.find()
     .then((directors) => {
@@ -464,7 +508,7 @@ app.get("/directors", (req, res) => {
     });
 });
 
-// Get genre by Name in Users list - This is not in the exercise
+// Return data about a director (bio, birth year, death year) by name
 app.get("/directors/:Name", (req, res) => {
   Director.findOne({ Name: req.params.Name })
     .then((director) => {
@@ -476,7 +520,7 @@ app.get("/directors/:Name", (req, res) => {
     });
 });
 
-// Allow users to update the genre info
+// Allow users to update the director info - This is not in the exercise
 app.put("/directors/:Name", (req, res) => {
   Director.findOneAndUpdate(
     { Name: req.params.Name },
@@ -500,6 +544,7 @@ app.put("/directors/:Name", (req, res) => {
   );
 });
 
+// Delete director - This is not in the exercise
 app.delete("/directors/:Name", (req, res) => {
   Director.findOneAndRemove({ Name: req.params.Name })
     .then((director) => {
@@ -513,34 +558,6 @@ app.delete("/directors/:Name", (req, res) => {
       console.error(err);
       res.status(400).send("Error: " + err);
     });
-});
-
-// READ
-app.get("/movies/genre/:genreName", (req, res) => {
-  const { genreName } = req.params;
-  const genre = movies.find(
-    (movie) => movie.genre.genreName === genreName
-  ).genre;
-
-  if (genre) {
-    res.status(200).json(genre);
-  } else {
-    res.status(400).send("No such genre");
-  }
-});
-
-// READ
-app.get("/movies/directors/:directorName", (req, res) => {
-  const { directorName } = req.params;
-  const director = movies.find(
-    (movie) => movie.directors.directorsName === directorName
-  ).directors;
-
-  if (director) {
-    res.status(200).json(director);
-  } else {
-    res.status(400).send("No such director");
-  }
 });
 
 app.listen(8080, () => {
