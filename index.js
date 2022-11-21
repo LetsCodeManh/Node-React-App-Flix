@@ -112,7 +112,7 @@ app.post("/movies", (req, res) => {
           Director: req.body.Director,
           Actors: req.body.Actors,
           ImagePath: req.body.ImagePath,
-          Featured: req.body.Featured
+          Featured: req.body.Featured,
         })
           .then((movie) => {
             res.status(200).json(movie);
@@ -148,7 +148,7 @@ app.get("/movies/:Title", (req, res) => {
       if (movie) {
         res.status(200).json(movie);
       } else {
-        res.status(400).send(req.params.Title + " was not found!")
+        res.status(400).send(req.params.Title + " was not found!");
       }
     })
     .catch((error) => {
@@ -157,20 +157,47 @@ app.get("/movies/:Title", (req, res) => {
     });
 });
 
+// Allow admin to update the movie info - This is not in the exercise
+app.put("/movies/:Title", (req, res) => {
+  Movie.findOneAndUpdate(
+    { Title: req.params.Title },
+    {
+      $set: {
+        Title: req.body.Title,
+        Description: req.body.Description,
+        Genre: req.body.Genre,
+        Director: req.body.Director,
+        Actors: req.body.Actors,
+        ImagePath: req.body.ImagePath,
+        Featured: req.body.Featured,
+      },
+    },
+    { new: true },
+    (err, updatedMovie) => {
+      if (err) {
+        console.error(err);
+        res.status(400).send("Error: " + err);
+      } else {
+        res.status(200).send(updatedMovie);
+      }
+    }
+  );
+});
+
 // Delete movie from movies list - This is not in the exercise
 app.delete("/movies/:Title", (req, res) => {
-  Movie.findOneAndRemove({ Title: req.params.Title})
+  Movie.findOneAndRemove({ Title: req.params.Title })
     .then((movie) => {
       if (!movie) {
-        res.status(400).send(req.params.Title + " was not found!")
+        res.status(400).send(req.params.Title + " was not found!");
       } else {
-        res.status(200).send(req.params.Title + " was deleted!")
+        res.status(200).send(req.params.Title + " was deleted!");
       }
     })
     .catch((err) => {
       console.error(err);
-      res.status(400).send("Error: " + err)
-    })
+      res.status(400).send("Error: " + err);
+    });
 });
 
 // Users AREA
@@ -251,20 +278,25 @@ app.put("/users/:Username", (req, res) => {
 });
 
 // Allow users to add a movie to their list of favorites
+// Needs to be done
 app.post("/users/:Username/movies/:MovieID", (req, res) => {
-  User.findOneAndUpdate({ Username: req.params.Username},
-    {$push: {
-      FavoriteMovies: req.params.MovieID
-    }},
-    { new: true},
+  User.findOneAndUpdate(
+    { Username: req.params.Username },
+    {
+      $push: {
+        FavoriteMovies: req.params.MovieID,
+      },
+    },
+    { new: true },
     (err, updatedUser) => {
       if (err) {
-        console.log(err)
-        res.status(400).send("Error: " + err)
+        console.log(err);
+        res.status(400).send("Error: " + err);
       } else {
-        res.status(200).json(updatedUser)
+        res.status(200).json(updatedUser);
       }
-    })
+    }
+  );
 });
 
 // Allow users to remove a movie from their list of favorites
@@ -288,20 +320,200 @@ app.delete("/users/:Username/movies/:Title", (req, res) => {
 
 // Allow existing users to deregister
 app.delete("/users/:Username", (req, res) => {
-  User.findOneAndRemove({ Username: req.params.Username})
+  User.findOneAndRemove({ Username: req.params.Username })
     .then((user) => {
       if (!user) {
-        res.status(400).send(req.params.Username + " was not found!")
+        res.status(400).send(req.params.Username + " was not found!");
       } else {
-        res.status(200).send(req.params.Username + " was deleted!")
+        res.status(200).send(req.params.Username + " was deleted!");
       }
     })
     .catch((err) => {
       console.error(err);
-      res.status(400).send("Error: " + err)
-    })
+      res.status(400).send("Error: " + err);
+    });
 });
 
+// Genres AREA
+// Creating a new genre in the Genres List - This is not in the exercise
+app.post("/genres", (req, res) => {
+  Genre.findOne({ Name: req.body.Name })
+    .then((genre) => {
+      if (genre) {
+        return res.status(400).send(req.body.Name + " already exists");
+      } else {
+        Genre.create({
+          Name: req.body.Name,
+          Description: req.body.Description,
+        })
+          .then((genre) => {
+            res.status(200).json(genre);
+          })
+          .catch((error) => {
+            console.error(error);
+            res.status(400).send("Error: " + error);
+          });
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(400).send("Error: " + error);
+    });
+});
+
+// Get ALL genres - This is not in the exercise
+app.get("/genres", (req, res) => {
+  Genre.find()
+    .then((genres) => {
+      res.status(200).json(genres);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(400).send("Error: " + error);
+    });
+});
+
+// Get genre by Name in Users list - This is not in the exercise
+app.get("/genres/:Name", (req, res) => {
+  Genre.findOne({ Name: req.params.Name })
+    .then((genre) => {
+      res.status(200).json(genre);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(400).send("Error: " + error);
+    });
+});
+
+// Allow users to update the genre info - This is not in the exercise
+app.put("/genres/:Name", (req, res) => {
+  Genre.findOneAndUpdate(
+    { Name: req.params.Name },
+    {
+      $set: {
+        Name: req.body.Name,
+        Description: req.body.Description,
+      },
+    },
+    { new: true },
+    (err, updatedGenre) => {
+      if (err) {
+        console.error(err);
+        res.status(400).send("Error: " + err);
+      } else {
+        res.status(200).send(updatedGenre);
+      }
+    }
+  );
+});
+
+// Delete the genre - This is not in the exercise
+app.delete("/genres/:Name", (req, res) => {
+  Genre.findOneAndRemove({ Name: req.params.Name })
+    .then((genre) => {
+      if (!genre) {
+        res.status(400).send(req.params.Name + " was not found!");
+      } else {
+        res.status(200).send(req.params.Name + " was deleted!");
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(400).send("Error: " + err);
+    });
+});
+
+// Directors AREA
+// Creating a new directors in the Directors List - This is not in the exercise
+app.post("/directors", (req, res) => {
+  Director.findOne({ Name: req.body.Name })
+    .then((director) => {
+      if (director) {
+        return res.status(400).send(req.body.Name + " already exists");
+      } else {
+        Director.create({
+          Name: req.body.Name,
+          Bio: req.body.Bio,
+          Birthday: req.body.Birthday,
+          Deathday: req.body.Deathday,
+        })
+          .then((director) => {
+            res.status(200).json(director);
+          })
+          .catch((error) => {
+            console.error(error);
+            res.status(400).send("Error: " + error);
+          });
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(400).send("Error: " + error);
+    });
+});
+
+// Get ALL genres - This is not in the exercise
+app.get("/directors", (req, res) => {
+  Director.find()
+    .then((directors) => {
+      res.status(200).json(directors);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(400).send("Error: " + error);
+    });
+});
+
+// Get genre by Name in Users list - This is not in the exercise
+app.get("/directors/:Name", (req, res) => {
+  Director.findOne({ Name: req.params.Name })
+    .then((director) => {
+      res.status(200).json(director);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(400).send("Error: " + error);
+    });
+});
+
+// Allow users to update the genre info
+app.put("/directors/:Name", (req, res) => {
+  Director.findOneAndUpdate(
+    { Name: req.params.Name },
+    {
+      $set: {
+        Name: req.body.Name,
+        Bio: req.body.Bio,
+        Birthday: req.body.Birthday,
+        Deathday: req.body.Deathday,
+      },
+    },
+    { new: true },
+    (err, updatedDirector) => {
+      if (err) {
+        console.error(err);
+        res.status(400).send("Error: " + err);
+      } else {
+        res.status(200).send(updatedDirector);
+      }
+    }
+  );
+});
+
+app.delete("/directors/:Name", (req, res) => {
+  Director.findOneAndRemove({ Name: req.params.Name })
+    .then((director) => {
+      if (!director) {
+        res.status(400).send(req.params.Name + " was not found!");
+      } else {
+        res.status(200).send(req.params.Name + " was deleted!");
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(400).send("Error: " + err);
+    });
+});
 
 // READ
 app.get("/movies/genre/:genreName", (req, res) => {
@@ -330,8 +542,6 @@ app.get("/movies/directors/:directorName", (req, res) => {
     res.status(400).send("No such director");
   }
 });
-
-
 
 app.listen(8080, () => {
   console.log("Your app is listening on port 8080.");
