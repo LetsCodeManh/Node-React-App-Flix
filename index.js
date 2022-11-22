@@ -147,7 +147,7 @@ app.get("/movies", (req, res) => {
 app.get("/movies/:Title", (req, res) => {
   Movie.findOne({ Title: req.params.Title })
     .populate("Genre")
-    .populate("Director") // Find one movie with this Title
+    .populate("Director")
     .then((movie) => {
       if (movie) {
         res.status(200).json(movie);
@@ -181,7 +181,7 @@ app.get("/movies/genres/:_Id", (req, res) => {
 });
 
 // Return movie with the director name
-// Needs to be done - Need helps here 
+// Needs to be done - Need helps here
 app.get("/movies/directors/:Name", (req, res) => {
   Movie.findMany({ "Director.Name": req.params.Name })
     .populate("Genre")
@@ -275,7 +275,7 @@ app.post("/users", (req, res) => {
 // Get all users - This is not in the exercise
 app.get("/users", (req, res) => {
   User.find()
-    // .populate("Movie") // Why it doesn't work?
+    .populate("FavoriteMovies", "Title")
     .then((users) => {
       res.status(200).json(users);
     })
@@ -288,7 +288,7 @@ app.get("/users", (req, res) => {
 // Get user by Username in Users list - This is not in the exercise
 app.get("/users/:Username", (req, res) => {
   User.findOne({ Username: req.params.Username })
-    // .populate("Movie")
+    .populate("FavoriteMovies", "Title")
     .then((user) => {
       res.status(200).json(user);
     })
