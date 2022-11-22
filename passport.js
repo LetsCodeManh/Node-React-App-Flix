@@ -1,14 +1,16 @@
 const passport = require("passport");
-const { ExtractJwt } = require("passport-jwt");
-const { User } = require("./models/users");
-const LocalStrategy = require("local-strategy").Strategy;
+const LocalStrategy = require("passport-local").Strategy;
 
-// const Models = require("./models.js"),
-// const passportJWT = require("passport-jwt")
-// let Users = Models.User
-// const JWTStrategy = passportJWT.Strategy
-// const ExtractJWT = passportJWT.ExtractJWT
+const passportJWT = require("passport-jwt");
+let JWTStrategy = passportJWT.Strategy;
+let ExtractJWT = passportJWT.ExtractJwt;
 
+// Get User from UserSchema
+const UsersSchema = require("./models/users.js");
+let User = UsersSchema.User;
+
+// Check for existing Username and Password
+// Check for valid Username and Password
 passport.use(
   new LocalStrategy(
     {
@@ -17,30 +19,37 @@ passport.use(
     },
     (username, password, callback) => {
       console.log(username + " " + password);
-      User.findOne({ Username: username }, (error, user) => {
-        if (error) {
-          console.log(error);
-          return callback(error);
+      User.findOne({ Username: username }, (err, user) => {
+        if (err) {
+          console.log(err);
+          return callback(err);
         }
 
+        // Check if the username can be found
         if (!user) {
           console.log("incorrect username");
-          return callback(null, false, {
-            message: "In correct username or password.",
-          });
+          return callback(null, false, { message: "Incorrect Username!" });
         }
 
-        console.log("finished");
+        // Check if the password is correct
+        if (!user.validatePassword(password)) {
+          console.log("Incorrect password");
+          return callback(null, false, { message: "Incorrect Password!" });
+        }
+
+        console.log("next");
         return callback(null, user);
       });
     }
   )
 );
 
+// JWT is extracted from the header of the http request.
+// JWT is a bearer token
 passport.use(
   new JWTStrategy(
     {
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
       secretOrKey: "your_jwt_secret",
     },
     (jwtPayload, callback) => {
@@ -48,8 +57,8 @@ passport.use(
         .then((user) => {
           return callback(null, user);
         })
-        .catch((error) => {
-          return callback(error);
+        .catch((err) => {
+          return callback(err);
         });
     }
   )
