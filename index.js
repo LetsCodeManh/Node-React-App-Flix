@@ -180,10 +180,10 @@ app.get("/movies/genres/:_Id", (req, res) => {
     });
 });
 
-// Retunr movie with the director name
+// Return movie with the director name
 // Needs to be done - Need helps here 
 app.get("/movies/directors/:Name", (req, res) => {
-  Movie.find({ "Director.Name": req.params.Name })
+  Movie.findMany({ "Director.Name": req.params.Name })
     .populate("Genre")
     .populate("Director")
     .then((movies) => {
@@ -275,7 +275,7 @@ app.post("/users", (req, res) => {
 // Get all users - This is not in the exercise
 app.get("/users", (req, res) => {
   User.find()
-    .populate("Movie")
+    // .populate("Movie") // Why it doesn't work?
     .then((users) => {
       res.status(200).json(users);
     })
@@ -288,7 +288,7 @@ app.get("/users", (req, res) => {
 // Get user by Username in Users list - This is not in the exercise
 app.get("/users/:Username", (req, res) => {
   User.findOne({ Username: req.params.Username })
-    .populate("Movie")
+    // .populate("Movie")
     .then((user) => {
       res.status(200).json(user);
     })
