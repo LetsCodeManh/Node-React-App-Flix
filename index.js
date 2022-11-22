@@ -1,22 +1,35 @@
+// Main NPM Package
 const express = require("express");
 const app = express();
-const morgan = require("morgan");
-const bodyParser = require("body-parser");
-const methodOverride = require("method-override");
-// const uuid = require("uuid");
-
 app.use(express.static("public"));
-app.use(morgan("common"));
+
+// const morgan = require("morgan");
+// app.use(morgan("common"));
 // app.use(myLogger);
 // app.use(requestTime);
+
+const bodyParser = require("body-parser");
 app.use(bodyParser.json());
-app.use(methodOverride());
+// bodyParser middle ware function
 app.use(
   bodyParser.urlencoded({
     extended: true,
   })
 );
 
+// const methodOverride = require("method-override");
+// app.use(methodOverride());
+
+// const uuid = require("uuid");
+
+// to import auth.js file... the (app) argument is to ensure Express is available in the auth.js file as well
+require("./auth")(app);
+
+// to require passport module and import passport.js file
+const passport = require("passport");
+require("./passport");
+
+// Get All the Schema Types from Models Folder
 const mongoose = require("mongoose");
 const MoviesSchema = require("./models/movies.js");
 const Movie = MoviesSchema.Movie;
@@ -35,7 +48,7 @@ mongoose.connect("mongodb://localhost:27017/dbname", {
   useUnifiedTopology: true,
 });
 
-// New Exercise
+// Old Exercise
 let users = [
   {
     id: 1,
@@ -99,49 +112,57 @@ let movies = [
 
 // Movies AREA
 // Create a movie in movies - This is not in the exercise
-app.post("/movies", (req, res) => {
-  Movie.findOne({ Title: req.body.Title })
-    .then((movie) => {
-      if (movie) {
-        return res.status(400).send(req.body.Title + " already exists");
-      } else {
-        Movie.create({
-          Title: req.body.Title,
-          Description: req.body.Description,
-          Genre: req.body.Genre,
-          Director: req.body.Director,
-          Actors: req.body.Actors,
-          ImagePath: req.body.ImagePath,
-          Featured: req.body.Featured,
-        })
-          .then((movie) => {
-            res.status(200).json(movie);
+app.post(
+  "/movies",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Movie.findOne({ Title: req.body.Title })
+      .then((movie) => {
+        if (movie) {
+          return res.status(400).send(req.body.Title + " already exists");
+        } else {
+          Movie.create({
+            Title: req.body.Title,
+            Description: req.body.Description,
+            Genre: req.body.Genre,
+            Director: req.body.Director,
+            Actors: req.body.Actors,
+            ImagePath: req.body.ImagePath,
+            Featured: req.body.Featured,
           })
-          .catch((error) => {
-            console.error(error);
-            res.status(400).send("Error: " + error);
-          });
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(400).send("Error: " + error);
-    });
-});
+            .then((movie) => {
+              res.status(200).json(movie);
+            })
+            .catch((error) => {
+              console.error(error);
+              res.status(400).send("Error: " + error);
+            });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(400).send("Error: " + error);
+      });
+  }
+);
 
 // Return a list off ALL movies
-app.get("/movies", (req, res) => {
-  Movie.find()
-    .populate("Genre")
-    .populate("Director") // Find all movies
-    .then((movies) => {
-      res.status(200).json(movies);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error: " + error);
-    });
-});
+app.get(
+  "/movies",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Movie.find()
+      .populate("Genre")
+      .populate("Director") // Find all movies
+      .then((movies) => {
+        res.status(200).json(movies);
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).send("Error: " + error);
+      });
+  }
+);
 
 // Return data (description. genre, directors, image URL, whether it's featured or not) about a single movie by title to the user
 app.get("/movies/:Title", (req, res) => {
