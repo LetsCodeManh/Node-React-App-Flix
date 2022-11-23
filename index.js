@@ -3,7 +3,7 @@ const express = require("express");
 const app = express();
 app.use(express.static("public"));
 
-const { check, validationResult } = require("express-validation");
+const { check, validationResult } = require("express-validator");
 
 // const morgan = require("morgan");
 // app.use(morgan("common"));

@@ -28,7 +28,7 @@ passport.use(
         // Check if the username can be found
         if (!user) {
           console.log("incorrect username");
-          return callback(null, false, { message: "Incorrect Username!" });
+          return callback(null, false, { message: "Incorrect Username or Password!" });
         }
 
         // Check if the password is correct
