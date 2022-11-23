@@ -17,13 +17,16 @@ app.use(
   })
 );
 
+const cors = require("cors");
+app.use(cors());
+
 // const methodOverride = require("method-override");
 // app.use(methodOverride());
 
 // const uuid = require("uuid");
 
 // to import auth.js file... the (app) argument is to ensure Express is available in the auth.js file as well
-require("./auth")(app);
+let auth = require("./auth")(app);
 
 // to require passport module and import passport.js file
 const passport = require("passport");
