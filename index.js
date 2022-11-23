@@ -3,6 +3,8 @@ const express = require("express");
 const app = express();
 app.use(express.static("public"));
 
+const { check, validationResult } = require("express-validation");
+
 // const morgan = require("morgan");
 // app.use(morgan("common"));
 // app.use(myLogger);
@@ -57,7 +59,6 @@ let allowedOrigins = ["http://localhost:8080", "http://testsite.com"];
 app.use(
   cors({
     origin: (origin, callback) => {
-      
       if (!origin) return callback(null, true);
       if (allowedOrigins.indexOf(origin) === -1) {
         //If a specific origin isn't found on the list of allowd origins
@@ -227,8 +228,31 @@ app.delete("/movies/:Title", (req, res) => {
 // Users AREA
 // Allow new users to register
 app.post("/users", (req, res) => {
+  // Validation logic here for request
+  [
+    // Check if the username length is min 6 charecters
+    check("Username", "Username is required").isLength({ min: 6 }),
+    // Check if the username has alphanumeric
+    check(
+      "Username",
+      "Username contains non alphanumeric charecters - not allowed."
+    ).isAlphanumeric(),
+    // Check if the password is empty
+    check("Password", "Password is required").not().isEmpty(),
+    // Check if the email is valid
+    check("Email", "Email does not appear to be valid").isEmail(),
+  ],
+    (req, res) => {
+      // check the validation object for errors
+      let errors = validationResult(req);
+
+      if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+      }
+    };
+
   // Create New Hashed Password
-  let hashedPassword = User.hashedPassword(req.body.Password)
+  let hashedPassword = User.hashedPassword(req.body.Password);
 
   // Search to see if a user with the Username already exists
   User.findOne({ Username: req.body.Username })
