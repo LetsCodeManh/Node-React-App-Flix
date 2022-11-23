@@ -19,9 +19,6 @@ app.use(
   })
 );
 
-const cors = require("cors");
-app.use(cors());
-
 // const methodOverride = require("method-override");
 // app.use(methodOverride());
 
@@ -48,12 +45,15 @@ const Genre = GenreSchema.Genre;
 const DirectorsSchema = require("./models/directors.js");
 const Director = DirectorsSchema.Director;
 
-mongoose.connect("mongodb://localhost:27017/dbname", {
+mongoose.connect("mongodb://localhost:27017/MyFlixDB", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
 // Cors
+const cors = require("cors");
+app.use(cors());
+
 let allowedOrigins = ["http://localhost:8080", "http://testsite.com"];
 
 app.use(
@@ -647,6 +647,7 @@ app.delete(
   }
 );
 
-app.listen(8080, () => {
-  console.log("Your app is listening on port 8080.");
+const port = process.env.PORT || 8080;
+app.listen(port, "0.0.0.0", () => {
+  console.log("Listening on Port " + port);
 });
