@@ -51,67 +51,25 @@ mongoose.connect("mongodb://localhost:27017/dbname", {
   useUnifiedTopology: true,
 });
 
-// Old Exercise
-let users = [
-  {
-    id: 1,
-    name: "test",
-    favoriteMovies: [],
-  },
-  {
-    id: 2,
-    name: "test2",
-    favoriteMovies: ["testMovie1", "testMovie2"],
-  },
-];
+// Cors
+let allowedOrigins = ["http://localhost:8080", "http://testsite.com"];
 
-let movies = [
-  {
-    title: "testMovieTitle",
-    description: "testMovieDescription",
-    genre: {
-      genreName: "testGenreName",
-      genreDescription: "testGenreDescription",
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        //If a specific origin isn't found on the list of allowd origins
+        let message =
+          "The CORS policy for this application doesn't allow access from origin " +
+          origin;
+        return callback(new Error(message), false);
+      }
+      return callback(null, true);
     },
-    directors: {
-      directorsName: "testDirectorsName",
-      directorsBio: "testDirectorsBio",
-      directorsBirth: "testDirectorsBirth",
-    },
-    movieImagesURL: "https://www.testmovieImagesURL.com",
-    feature: false,
-  },
-  {
-    title: "testMovieTitle2",
-    description: "testMovieDescription2",
-    genre: {
-      genreName: "testGenreName2",
-      genreDescription: "testGenreDescription2",
-    },
-    directors: {
-      directorsName: "testDirectorsName2",
-      directorsBio: "testDirectorsBio2",
-      directorsBirth: "testDirectorsBirth2",
-    },
-    movieImagesURL: "https://www.testmovieImagesURL2.com",
-    feature: false,
-  },
-  {
-    title: "testMovieTitle3",
-    description: "testMovieDescription3",
-    genre: {
-      genreName: "testGenreName3",
-      genreDescription: "testGenreDescription3",
-    },
-    directors: {
-      directorsName: "testDirectorsName3",
-      directorsBio: "testDirectorsBio3",
-      directorsBirth: "testDirectorsBirth3",
-    },
-    movieImagesURL: "https://www.testmovieImagesURL3.com",
-    feature: false,
-  },
-];
+  })
+);
 
 // Movies AREA
 // Create a movie in movies - This is not in the exercise
@@ -269,14 +227,19 @@ app.delete("/movies/:Title", (req, res) => {
 // Users AREA
 // Allow new users to register
 app.post("/users", (req, res) => {
+  // Create New Hashed Password
+  let hashedPassword = User.hashedPassword(req.body.Password)
+
+  // Search to see if a user with the Username already exists
   User.findOne({ Username: req.body.Username })
     .then((user) => {
       if (user) {
+        // If the user already exists
         return res.status(400).send(req.body.Username + " already exists");
       } else {
         User.create({
           Username: req.body.Username,
-          Password: req.body.Password,
+          Password: hashedPassword, //Adding Hashed Password
           Email: req.body.Email,
           Birthday: req.body.Birthday,
           FavoriteMovies: req.body.FavoriteMovies,
