@@ -68,7 +68,7 @@ app.use(
 );
 
 app.get("/", (req, res) => {
-  res.send("Welcome to my Movie API!");
+  res.send("Welcome to this boring site! But not for long!");
 });
 
 // Movies AREA
