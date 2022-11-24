@@ -67,6 +67,10 @@ app.use(
   })
 );
 
+app.get("/", (req, res) => {
+  res.send("Welcome to my Movie API!");
+});
+
 // Movies AREA
 // Create a movie in movies - This is not in the exercise
 app.post(
