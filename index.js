@@ -5,11 +5,6 @@ app.use(express.static("public"));
 
 const { check, validationResult } = require("express-validator");
 
-// const morgan = require("morgan");
-// app.use(morgan("common"));
-// app.use(myLogger);
-// app.use(requestTime);
-
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 // bodyParser middle ware function
@@ -18,11 +13,6 @@ app.use(
     extended: true,
   })
 );
-
-// const methodOverride = require("method-override");
-// app.use(methodOverride());
-
-// const uuid = require("uuid");
 
 // to import auth.js file... the (app) argument is to ensure Express is available in the auth.js file as well
 let auth = require("./auth")(app);
@@ -657,3 +647,13 @@ const port = process.env.PORT || 8080;
 app.listen(port, "0.0.0.0", () => {
   console.log("Listening on Port " + port);
 });
+
+// const methodOverride = require("method-override");
+// app.use(methodOverride());
+
+// const uuid = require("uuid");
+
+// const morgan = require("morgan");
+// app.use(morgan("common"));
+// app.use(myLogger);
+// app.use(requestTime);
