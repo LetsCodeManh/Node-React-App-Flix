@@ -45,11 +45,6 @@ const Genre = GenreSchema.Genre;
 const DirectorsSchema = require("./models/directors.js");
 const Director = DirectorsSchema.Director;
 
-mongoose.connect("mongodb://localhost:27017/MyFlixDB", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
 // Cors
 const cors = require("cors");
 app.use(cors());
@@ -646,6 +641,13 @@ app.delete(
       });
   }
 );
+
+// CONNECTION_URI
+
+mongoose.connect(process.env.CONNECTION_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 const port = process.env.PORT || 8080;
 app.listen(port, "0.0.0.0", () => {
