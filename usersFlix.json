@@ -1,5 +1,0 @@
-{"_id":{"$oid":"6378a3ce3b7345a9f0fe3e7d"},"Name":"John","Password":"JohnPassword","Email":"John@example.com","Birthday":{"$date":"2000-01-01T00:00:00Z"},"FavouriteMovies":[{"$oid":"6378a1c33b7345a9f0fe3e79"},{"$oid":"6378a1dc3b7345a9f0fe3e7b"}]}
-{"_id":{"$oid":"6378a3ed3b7345a9f0fe3e7e"},"Name":"Meral","Password":"MeralPassword","Email":"Meral@example.com","Birthday":{"$date":"2000-02-02T00:00:00Z"},"FavouriteMovies":[]}
-{"_id":{"$oid":"6378a3ed3b7345a9f0fe3e7f"},"Name":"Lata","Password":"LataPassword","Email":"Lata@example.com","Birthday":{"$date":"2000-03-03T00:00:00Z"},"FavouriteMovies":[]}
-{"_id":{"$oid":"6378a3ed3b7345a9f0fe3e80"},"Name":"Mena","Password":"MenaPassword","Email":"Mena@example.com","Birthday":{"$date":"2000-04-04T00:00:00Z"},"FavouriteMovies":[]}
-{"_id":{"$oid":"6378a3ed3b7345a9f0fe3e81"},"Name":"Idontknow","Password":"IdontknowPassword","Email":"Idontknow@example.com","Birthday":{"$date":"2000-05-05T00:00:00Z"},"FavouriteMovies":[]}

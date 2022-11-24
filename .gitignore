@@ -37,6 +37,7 @@ ehthumbs.db
 Thumbs.db
 
 # Ignore Mac System Files
-.DS_Store
 scss/
 node_modules/
+Old_Files/
+Dummy_Database
