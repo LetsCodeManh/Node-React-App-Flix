@@ -39,7 +39,7 @@ const Director = DirectorsSchema.Director;
 const cors = require("cors");
 app.use(cors());
 
-let allowedOrigins = ["http://localhost:8080", "http://testsite.com"];
+let allowedOrigins = ["http://localhost:8080", "http://http://localhost:1234"];
 
 app.use(
   cors({
@@ -65,7 +65,8 @@ app.get("/", (req, res) => {
 // Create a movie in movies - This is not in the exercise
 app.post(
   "/movies",
-  passport.authenticate("jwt", { session: false }),
+  // Short comment out to test
+  // passport.authenticate("jwt", { session: false }),
   (req, res) => {
     Movie.findOne({ Title: req.body.Title })
       .then((movie) => {
