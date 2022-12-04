@@ -7,7 +7,7 @@ let ExtractJWT = passportJWT.ExtractJwt;
 
 // Get User from UserSchema
 const UsersSchema = require("./models/users.js");
-let User = UsersSchema.User;
+let Users = UsersSchema.User;
 
 // Check for existing Username and Password
 // Check for valid Username and Password
@@ -18,8 +18,7 @@ passport.use(
       passwordField: "Password",
     },
     (username, password, callback) => {
-      console.log(username + " " + password);
-      User.findOne({ Username: username }, (err, user) => {
+      Users.findOne({ Username: username }, (err, user) => {
         if (err) {
           console.log(err);
           return callback(err);
@@ -39,7 +38,7 @@ passport.use(
           return callback(null, false, { message: "Incorrect Password!" });
         }
 
-        console.log("next");
+        console.log("finished");
         return callback(null, user);
       });
     }
@@ -55,7 +54,7 @@ passport.use(
       secretOrKey: "your_jwt_secret",
     },
     (jwtPayload, callback) => {
-      return User.findById(jwtPayload._id)
+      return Users.findById(jwtPayload._id)
         .then((user) => {
           return callback(null, user);
         })

@@ -15,7 +15,7 @@ app.use(
 );
 
 // to import auth.js file... the (app) argument is to ensure Express is available in the auth.js file as well
-let auth = require("./auth")(app);
+require("./auth")(app);
 
 // to require passport module and import passport.js file
 const passport = require("passport");
@@ -39,23 +39,23 @@ const Director = DirectorsSchema.Director;
 const cors = require("cors");
 app.use(cors());
 
-let allowedOrigins = ["http://localhost:8080", "http://localhost:1234"];
+// let allowedOrigins = ["http://localhost:8080", "http://localhost:1234"];
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) === -1) {
-        //If a specific origin isn't found on the list of allowd origins
-        let message =
-          "The CORS policy for this application doesn't allow access from origin " +
-          origin;
-        return callback(new Error(message), false);
-      }
-      return callback(null, true);
-    },
-  })
-);
+// app.use(
+//   cors({
+//     origin: (origin, callback) => {
+//       if (!origin) return callback(null, true);
+//       if (allowedOrigins.indexOf(origin) === -1) {
+//         //If a specific origin isn't found on the list of allowd origins
+//         let message =
+//           "The CORS policy for this application doesn't allow access from origin " +
+//           origin;
+//         return callback(new Error(message), false);
+//       }
+//       return callback(null, true);
+//     },
+//   })
+// );
 
 app.get("/", (req, res) => {
   res.send("Welcome to this boring site! But not for long!");
@@ -323,12 +323,15 @@ app.put(
   "/users/:Username",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
+    // Create New Hashed Password
+    let hashedPassword = User.hashPassword(req.body.Password);
+
     User.findOneAndUpdate(
       { Username: req.params.Username },
       {
         $set: {
           Username: req.body.Username,
-          Password: req.body.Password,
+          Password: hashedPassword,
           Email: req.body.Email,
           Birthday: req.body.Birthday,
           FavoriteMovies: req.body.FavoriteMovies,
